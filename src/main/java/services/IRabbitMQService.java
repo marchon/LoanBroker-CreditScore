@@ -1,8 +1,11 @@
 package services;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.GetResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -24,25 +27,72 @@ public interface IRabbitMQService {
      */
     public Connection getRabbitMQConnection(String host, String user, String pass, int port) throws IOException, TimeoutException;
     /**
-     * Post a message to a specific exchange and route. Will be created if they does not exist.
+     * Function for creating a queue. If the queue already exist no action is taken.
+     * 
+     * @param queueName
+     * @param durable
+     * @param exclusive
+     * @param autoDelete
+     * @param args
+     * @param channel
+     * @throws IOException 
+     */
+    public void createQueue(String queueName, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> args, Channel channel) throws IOException;
+    /**
+     * Function for creating an exchange to communicate with the a queue. If the exchange
+     * already exists no action is taken.
+     * 
+     * @param exchangeName
+     * @param exchangeType
+     * @param durable
+     * @param channel
+     * @throws IOException 
+     */
+    public void createExchange(String exchangeName, String exchangeType, boolean durable, Channel channel) throws IOException;
+    /**
+     * Function for binding an exchange to a queue, a routing key is used to provide specific communication routes.
+     * 
+     * @param exchangeName
+     * @param queueName
+     * @param routingKey
+     * @param channel
+     * @throws IOException 
+     */
+    public void bindExchangeQueue(String exchangeName, String queueName, String routingKey, Channel channel) throws IOException;
+    /**
+     * Post a message to a queue using a specific exchange and route key. The BasicProperties is to supply headers
+     * and other meta data.
      * 
      * @param message
      * @param exchangeName
      * @param routingKey
-     * @param conn
+     * @param props
+     * @param channel
      * @throws IOException
      */
-    public void postToChannel(String message, String exchangeName, String routingKey, Connection conn) throws IOException;
+    public void postToQueue(String message, String exchangeName, String routingKey, AMQP.BasicProperties props, Channel channel) throws IOException;
     /**
-     * Listen to a channel.
+     * Function that retrieves a message from a queue. The autoAcknowledge indicates if the
+     * message should be instantly deleted from the queue or hidden until acknowledge is manually
+     * send.
      * 
-     * @param exchangeName
+     * @param queueName
      * @param routingKey
-     * @param conn
+     * @param autoAcknowledge
+     * @param channel
      * @return
      * @throws IOException 
      */
-    public String listenToChannel(String exchangeName, String routingKey, Connection conn) throws IOException;
+    public GetResponse getResponseFromQueue(String queueName, String routingKey, boolean autoAcknowledge, Channel channel) throws IOException;
+    /**
+     * Function to send acknowledge to queue when a message is correctly handled by the service.
+     * This is to ensure that a message is not lost without being correctly handled.
+     * 
+     * @param channel
+     * @param response
+     * @throws IOException 
+     */
+    public void sendAcknowledgement(Channel channel, GetResponse response) throws IOException;
     /**
      * Close the RabbitMQ connection.
      * 
