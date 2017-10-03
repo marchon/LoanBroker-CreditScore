@@ -28,13 +28,30 @@ public class RabbitMQService implements IRabbitMQService {
     }
     
     @Override
+    public Connection getRabbitMQConnection(String host) throws IOException, TimeoutException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(host);
+        return factory.newConnection();
+    }
+    
+    @Override
     public void createQueue(String queueName, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> args, Channel channel) throws IOException {
         channel.queueDeclare(queueName, durable, exclusive, autoDelete, args);
     }
     
     @Override
+    public void deleteQueue(String queueName, Channel channel) throws IOException {
+        channel.queueDelete(queueName);
+    }
+    
+    @Override
     public void createExchange(String exchangeName, String exchangeType, boolean durable, Channel channel) throws IOException {
         channel.exchangeDeclare(exchangeName, exchangeType, durable);
+    }
+    
+    @Override
+    public void deleteExchange(String exchangeName, Channel channel) throws IOException {
+        channel.exchangeDelete(exchangeName);
     }
     
     @Override

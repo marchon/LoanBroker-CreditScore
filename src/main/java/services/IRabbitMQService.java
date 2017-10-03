@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
  */
 public interface IRabbitMQService {
     /**
-     * Creates a connection to a RabbitMQ message queue.
+     * Creates a connection to the RabbitMQ message service.
      * 
      * @param host
      * @param user
@@ -26,6 +26,15 @@ public interface IRabbitMQService {
      * @throws TimeoutException 
      */
     public Connection getRabbitMQConnection(String host, String user, String pass, int port) throws IOException, TimeoutException;
+    /**
+     * Creates a connection to the RabbitMQ message service. Use this to connect to localhost.
+     * 
+     * @param host
+     * @return
+     * @throws IOException
+     * @throws TimeoutException 
+     */
+    public Connection getRabbitMQConnection(String host) throws IOException, TimeoutException;
     /**
      * Function for creating a queue. If the queue already exist no action is taken.
      * 
@@ -39,6 +48,14 @@ public interface IRabbitMQService {
      */
     public void createQueue(String queueName, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> args, Channel channel) throws IOException;
     /**
+     * Function to remove a queue from the RabbitMQ Service.
+     * 
+     * @param queueName
+     * @param channel
+     * @throws IOException 
+     */
+    public void deleteQueue(String queueName, Channel channel) throws IOException;
+    /**
      * Function for creating an exchange to communicate with the a queue. If the exchange
      * already exists no action is taken.
      * 
@@ -49,6 +66,14 @@ public interface IRabbitMQService {
      * @throws IOException 
      */
     public void createExchange(String exchangeName, String exchangeType, boolean durable, Channel channel) throws IOException;
+    /**
+     * Function to remove an exchange from the RabbitMQ service.
+     * 
+     * @param exchangeName
+     * @param channel
+     * @throws IOException 
+     */
+    public void deleteExchange(String exchangeName, Channel channel) throws IOException;
     /**
      * Function for binding an exchange to a queue, a routing key is used to provide specific communication routes.
      * 
