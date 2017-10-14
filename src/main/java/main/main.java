@@ -24,7 +24,7 @@ public class main {
         System.out.println("Initializing workers...");
         
         for (int i = 0; i < cores; i++) {
-            pool.submit(new Consumer());
+            pool.execute(new Consumer());
             System.out.println("Worker number " + (i+1) + " started.");
         }
         
