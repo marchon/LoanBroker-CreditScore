@@ -2,7 +2,6 @@ package workers;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.GetResponse;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
@@ -29,12 +28,12 @@ public class Publisher implements Runnable {
         
         try (Connection conn = service.getRabbitMQConnection("localhost")) {
             Channel channel = conn.createChannel();
-            service.createQueue("creditScore", true, false, false, null, channel);
-            service.createExchange("creditScore", "direct", true, channel);
-            service.bindExchangeQueue("creditScore", "creditScore", "", channel);
+            service.createQueue("g6_queue_rulebase", true, false, false, null, channel);
+            service.createExchange("g6_queue_rulebase", "direct", true, channel);
+            service.bindExchangeQueue("g6_queue_rulebase", "g6_queue_rulebase", "", channel);
             
             String message = new JSONObject(loanRequest).toString();
-            service.postToQueue(message, "creditScore", "", null, channel);
+            service.postToQueue(message, "g6_queue_rulebase", "", null, channel);
             channel.close();
         } catch (IOException | TimeoutException ex) {
             Logger.getLogger(Publisher.class.getName()).log(Level.SEVERE, null, ex);

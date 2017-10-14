@@ -1,6 +1,8 @@
 package main;
 
 import com.rabbitmq.client.GetResponse;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import models.LoanRequest;
 import org.json.JSONObject;
 import services.CreditScoreService;
@@ -8,19 +10,24 @@ import workers.Consumer;
 import workers.Publisher;
 
 public class main {
+    
+    private static int numberOfWorkers;
 
     public static void main(String[] args) {
-        CreditScoreService cs = new CreditScoreService();
-        System.out.println("Credit for user is: " + cs.getCreditScore("010180-5100"));
         
-        LoanRequest request = new LoanRequest(1,2);
+        System.out.println("CreditScore application running...");
         
-        Runnable r = new Publisher(request);
-        r.run();
+        int cores = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(cores);
         
-        GetResponse response = new Consumer().call();
-        byte[] msg = response.getBody();
-//        
-        System.out.println("Message is: " + msg);
+        System.out.println("Cores available: " + cores);
+        System.out.println("Initializing workers...");
+        
+        for (int i = 0; i < cores; i++) {
+            pool.submit(new Consumer());
+            System.out.println("Worker number " + (i+1) + " started.");
+        }
+        
+        System.out.println("All workers are running.");
     }
 }

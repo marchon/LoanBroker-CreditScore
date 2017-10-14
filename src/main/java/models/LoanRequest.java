@@ -6,12 +6,24 @@ package models;
  */
 public class LoanRequest {
     
+    private String ssn;
     private int creditScore;
-    private int loanAmount;
+    private Double loanAmount;
+    private int days;
 
-    public LoanRequest(int creditScore, int loanAmount) {
+    public LoanRequest(String ssn, int creditScore, Double loanAmount, int duration) {
+        this.ssn = ssn;
         this.creditScore = creditScore;
         this.loanAmount = loanAmount;
+        this.days = duration;
+    }
+
+    public String getSsn() {
+        return ssn;
+    }
+
+    public void setSsn(String ssn) {
+        this.ssn = ssn;
     }
     
     public int getCreditScore() {
@@ -22,11 +34,19 @@ public class LoanRequest {
         this.creditScore = creditScore;
     }
 
-    public int getLoanAmount() {
+    public Double getLoanAmount() {
         return loanAmount;
     }
 
-    public void setLoanAmount(int loanAmount) {
+    public void setLoanAmount(Double loanAmount) {
         this.loanAmount = loanAmount;
+    }
+
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
     }
 }
