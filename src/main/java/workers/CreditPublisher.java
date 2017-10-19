@@ -14,11 +14,11 @@ import services.RabbitMQService;
  *
  * @author Group 6
  */
-public class Publisher implements Runnable {
+public class CreditPublisher implements Runnable {
     
     private LoanRequest loanRequest;
     
-    public Publisher(LoanRequest loanRequest) {
+    public CreditPublisher(LoanRequest loanRequest) {
         this.loanRequest = loanRequest;
     }
 
@@ -36,7 +36,7 @@ public class Publisher implements Runnable {
             service.postToQueue(message, "g6_queue_rulebase", "", null, channel);
             channel.close();
         } catch (IOException | TimeoutException ex) {
-            Logger.getLogger(Publisher.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreditPublisher.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

@@ -1,33 +1,36 @@
 package main;
 
-import com.rabbitmq.client.GetResponse;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import models.LoanRequest;
-import org.json.JSONObject;
-import services.CreditScoreService;
-import workers.Consumer;
-import workers.Publisher;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import workers.CreditConsumer;
 
 public class main {
-    
+
     private static int numberOfWorkers;
 
-    public static void main(String[] args) {
-        
-        System.out.println("CreditScore application running...");
-        
-        int cores = Runtime.getRuntime().availableProcessors();
-        ExecutorService pool = Executors.newFixedThreadPool(cores);
-        
-        System.out.println("Cores available: " + cores);
-        System.out.println("Initializing workers...");
-        
-        for (int i = 0; i < cores; i++) {
-            pool.execute(new Consumer());
-            System.out.println("Worker number " + (i+1) + " started.");
+    public static void main(String[] args) throws IOException {
+
+        try {
+            System.out.println("CreditScore application running...");
+            
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost("localhost");
+            Connection connection = factory.newConnection();
+            Channel channel = connection.createChannel();
+            
+            channel.queueDeclare("g6_queue_credit", true, false, false, null);
+            channel.basicConsume("g6_queue_credit", true, new CreditConsumer(channel));
+            
+            System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
+        } catch (TimeoutException ex) {
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        System.out.println("All workers are running.");
+        
     }
 }
